@@ -1,15 +1,10 @@
-// Pega aquí los datos de tu app web de Firebase.
-// Consola Firebase → Configuración del proyecto → Tus apps → SDK.
-// ownerEmail tiene que ser el mismo correo del usuario que creas en Authentication
-// y el mismo que escribes en firestore.rules.
-
 export const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: "",
+  apiKey: "AIzaSyDqGsxIW957LHrA3lny1J1R5w_S-oz3Bdo",
+  authDomain: "listadecompras-8dcd9.firebaseapp.com",
+  projectId: "listadecompras-8dcd9",
+  storageBucket: "listadecompras-8dcd9.firebasestorage.app",
+  messagingSenderId: "1084013578040",
+  appId: "1:1084013578040:web:caec7daac0cf5a579123cd",
 };
 
-export const ownerEmail = "";
+export const ownerEmail = "chowwha@gmail.com";

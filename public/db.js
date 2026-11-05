@@ -188,7 +188,7 @@ export function changePassword(password) {
   return guard(async () => {
     ensure();
     const next = String(password || "");
-    if (next.length < 4) throw new Error("Usa al menos 4 caracteres");
+    if (next.length < 6) throw new Error("Firebase pide al menos 6 caracteres");
     if (next.length > 80) throw new Error("La contraseña es demasiado larga");
     if (!auth.currentUser) throw new Error("Necesitas entrar de nuevo");
     await updatePassword(auth.currentUser, next);
