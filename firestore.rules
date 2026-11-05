@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner() {
+      return request.auth != null
+        && request.auth.token.email == "REEMPLAZA_CON_TU_CORREO";
+    }
+
+    function validName(name) {
+      return name is string && name.size() > 0 && name.size() <= 80;
+    }
+
+    function validSection(data) {
+      return data.keys().hasOnly(['name', 'color', 'order'])
+        && validName(data.name)
+        && data.color is string
+        && data.color.matches('^#[0-9a-fA-F]{6}$')
+        && data.order is number;
+    }
+
+    function validProduct(data) {
+      return data.keys().hasOnly(['name', 'sectionId', 'order', 'pending'])
+        && validName(data.name)
+        && data.sectionId is string
+        && data.sectionId.size() <= 80
+        && data.order is number
+        && data.pending is bool;
+    }
+
+    function validMark(data) {
+      return data.keys().hasOnly(['marked', 'qty', 'bought'])
+        && data.marked is bool
+        && data.qty is int
+        && data.qty >= 1
+        && data.qty <= 999
+        && data.bought is bool
+        && (!data.bought || data.marked);
+    }
+
+    match /sections/{id} {
+      allow read: if true;
+      allow create, update: if isOwner() && validSection(request.resource.data);
+      allow delete: if isOwner();
+    }
+
+    match /products/{id} {
+      allow read: if true;
+      allow create: if validProduct(request.resource.data) && (
+        isOwner()
+        || (request.resource.data.pending == true && request.resource.data.sectionId == "")
+      );
+      allow update, delete: if isOwner();
+    }
+
+    match /marks/{id} {
+      allow read: if true;
+      allow create, update: if validMark(request.resource.data);
+      allow delete: if true;
+    }
+  }
+}

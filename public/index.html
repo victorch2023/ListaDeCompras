@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#f3efe6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Compras">
+  <title>Compras</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="page-shop">
+  <div id="setup" class="setup" hidden>
+    <p class="eyebrow">Lista compartida</p>
+    <h1>Falta conectar Firebase</h1>
+    <p>Abre <code>public/firebase-config.js</code> y pega los datos de tu app web. En <code>firestore.rules</code> cambia <code>REEMPLAZA_CON_TU_CORREO</code> por el mismo correo y publica esas reglas en Firebase.</p>
+  </div>
+  <div class="sheet">
+    <div class="sticky-top">
+      <header class="top">
+        <div>
+          <p class="eyebrow">Lista compartida</p>
+          <h1>Compras</h1>
+        </div>
+        <div class="top-side">
+          <p id="presence" class="presence"><span class="dot"></span><span id="presence-text">Conectando…</span></p>
+          <a class="panel-link" href="admin/">Panel</a>
+        </div>
+      </header>
+      <div class="toolbar">
+        <label class="search">
+          <span class="sr-only">Buscar producto</span>
+          <input id="search" type="search" placeholder="Buscar producto" autocomplete="off" enterkeyhint="search">
+          <button id="clear-search" type="button" hidden aria-label="Borrar búsqueda">×</button>
+        </label>
+        <div class="filters" role="tablist" aria-label="Qué productos ver">
+          <button type="button" id="filter-all" class="is-active" role="tab" aria-selected="true">Todos</button>
+          <button type="button" id="filter-marked" role="tab" aria-selected="false">Para comprar <span id="marked-count">0</span></button>
+        </div>
+        <div class="toolbar-foot">
+          <p id="summary" class="summary">Nada marcado todavía. Al marcar un producto, la cantidad es 1.</p>
+          <button type="button" id="clear-marks" class="text-btn" disabled>Vaciar marcas</button>
+        </div>
+        <p id="banner" class="banner" hidden></p>
+      </div>
+      <div class="colhead" aria-hidden="true">
+        <span></span>
+        <span>Producto</span>
+        <span>Cantidad</span>
+        <span>Comprado</span>
+      </div>
+    </div>
+    <div id="list" class="list" aria-live="polite"></div>
+    <form id="suggest-form" class="suggest">
+      <label>
+        <span class="sr-only">Producto que no está en la lista</span>
+        <input id="suggest-name" name="name" type="text" maxlength="80" placeholder="Agregar un producto que no está" autocomplete="off" enterkeyhint="done" required>
+      </label>
+      <button class="btn primary" type="submit">Agregar</button>
+      <p id="suggest-note" class="suggest-note" role="status"></p>
+    </form>
+  </div>
+
+  <dialog id="confirm-clear">
+    <form method="dialog">
+      <h2>Vaciar marcas</h2>
+      <p>Se quitan las marcas, las cantidades y lo anotado como comprado. Los productos siguen en la lista.</p>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn ghost">Cancelar</button>
+        <button value="ok" class="btn danger">Vaciar</button>
+      </div>
+    </form>
+  </dialog>
+  <noscript><p class="noscript">Esta lista necesita JavaScript para verse y sincronizarse.</p></noscript>
+  <script type="module" src="shop.js"></script>
+</body>
+</html>
