@@ -7,8 +7,10 @@ import {
   writeBatch,
   deleteDoc,
   setDoc,
+  addDoc,
   query,
   orderBy,
+  serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 import {
   getAuth,
@@ -306,6 +308,22 @@ export function clearAllMarks() {
   return guard(async () => {
     ensure();
     requireReady();
+    const bought = memory.products
+      .filter((product) => {
+        const item = memory.items[product.id];
+        return item && item.marked && item.bought;
+      })
+      .map((product) => ({
+        id: product.id,
+        name: product.name,
+        qty: Math.min(999, Math.max(1, memory.items[product.id].qty || 1)),
+      }));
+    if (bought.length) {
+      await addDoc(collection(db, "purchases"), {
+        at: serverTimestamp(),
+        items: bought,
+      });
+    }
     const ids = Object.keys(memory.items);
     for (let offset = 0; offset < ids.length; offset += 400) {
       const batch = writeBatch(db);
@@ -314,6 +332,22 @@ export function clearAllMarks() {
     }
     memory.items = {};
     return emit();
+  });
+}
+
+export function watchPurchases(fn) {
+  ensure();
+  const purchases = query(collection(db, "purchases"), orderBy("at", "desc"));
+  return onSnapshot(purchases, (snap) => {
+    fn(snap.docs.map((item) => {
+      const data = item.data();
+      const at = data.at && typeof data.at.toDate === "function" ? data.at.toDate() : null;
+      return {
+        id: item.id,
+        at,
+        items: Array.isArray(data.items) ? data.items : [],
+      };
+    }));
   });
 }
 

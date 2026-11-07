@@ -450,6 +450,23 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 
 .inbox-meta { color: var(--muted); font-size: 13px; }
 
+.purchase {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.purchase time {
+  display: block;
+  font-weight: 650;
+}
+
+.purchase ul {
+  margin: 6px 0 0;
+  padding-left: 1.15rem;
+}
+
+.purchase li { margin: 2px 0; }
+
 .login-wrap {
   min-height: 100vh;
   display: grid;

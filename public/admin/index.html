@@ -56,6 +56,15 @@
       </form>
     </section>
 
+    <section class="block">
+      <div class="block-head">
+        <h2>Compras registradas</h2>
+        <p id="purchase-count" class="hint"></p>
+      </div>
+      <p class="lede">Cada vez que alguien vacía las marcas, aquí queda lo que estaba marcado como comprado, con la fecha y la hora.</p>
+      <div id="purchases" class="purchases"></div>
+    </section>
+
     <section class="block" id="inbox-block" hidden>
       <div class="block-head">
         <h2>Por ubicar</h2>
@@ -107,7 +116,7 @@
     <section class="block split">
       <div>
         <h2>Compra en curso</h2>
-        <p class="lede">Quita las marcas de todos, sin tocar el catálogo.</p>
+        <p class="lede">Quita las marcas de todos, sin tocar el catálogo. Lo comprado pasa al historial de arriba.</p>
         <button type="button" id="clear-marks" class="btn danger">Vaciar marcas</button>
       </div>
       <form id="password-form">
