@@ -7,10 +7,13 @@ import {
   writeBatch,
   deleteDoc,
   setDoc,
+  updateDoc,
   addDoc,
+  getDocs,
   query,
   orderBy,
   serverTimestamp,
+  Timestamp,
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 import {
   getAuth,
@@ -308,23 +311,34 @@ export function clearAllMarks() {
   return guard(async () => {
     ensure();
     requireReady();
-    const bought = memory.products
-      .filter((product) => {
-        const item = memory.items[product.id];
-        return item && item.marked && item.bought;
-      })
-      .map((product) => ({
+    const snap = await getDocs(collection(db, "marks"));
+    const marks = new Map(snap.docs.map((item) => [item.id, item.data()]));
+    const bought = [];
+    for (const product of memory.products) {
+      const data = marks.get(product.id);
+      if (!data || !data.marked || !data.bought) continue;
+      bought.push({
         id: product.id,
         name: product.name,
-        qty: Math.min(999, Math.max(1, memory.items[product.id].qty || 1)),
-      }));
+        qty: Math.min(999, Math.max(1, Number(data.qty) || 1)),
+      });
+      marks.delete(product.id);
+    }
+    for (const [id, data] of marks) {
+      if (!data.marked || !data.bought) continue;
+      bought.push({
+        id,
+        name: id,
+        qty: Math.min(999, Math.max(1, Number(data.qty) || 1)),
+      });
+    }
     if (bought.length) {
       await addDoc(collection(db, "purchases"), {
         at: serverTimestamp(),
         items: bought,
       });
     }
-    const ids = Object.keys(memory.items);
+    const ids = snap.docs.map((item) => item.id);
     for (let offset = 0; offset < ids.length; offset += 400) {
       const batch = writeBatch(db);
       for (const id of ids.slice(offset, offset + 400)) batch.delete(doc(db, "marks", id));
@@ -332,6 +346,47 @@ export function clearAllMarks() {
     }
     memory.items = {};
     return emit();
+  });
+}
+
+function purchaseItems(items) {
+  if (!Array.isArray(items)) return [];
+  return items
+    .map((item) => ({
+      id: String(item?.id || "").slice(0, 80),
+      name: String(item?.name || "").trim().slice(0, 80),
+      qty: Math.min(999, Math.max(1, Math.round(Number(item?.qty) || 1))),
+    }))
+    .filter((item) => item.name);
+}
+
+export function savePurchaseItems(id, items) {
+  return guard(async () => {
+    ensure();
+    const next = purchaseItems(items);
+    if (!next.length) throw new Error("Esa fecha ya no tiene productos.");
+    await updateDoc(doc(db, "purchases", id), { items: next });
+  });
+}
+
+export function deletePurchase(id) {
+  return guard(async () => {
+    ensure();
+    await deleteDoc(doc(db, "purchases", id));
+  });
+}
+
+export function restorePurchase(id, at, items) {
+  return guard(async () => {
+    ensure();
+    const when = at instanceof Date ? at : new Date(at);
+    if (Number.isNaN(when.getTime())) throw new Error("No se pudo recuperar la fecha.");
+    const next = purchaseItems(items);
+    if (!next.length) throw new Error("No hay productos para recuperar.");
+    await setDoc(doc(db, "purchases", id), {
+      at: Timestamp.fromDate(when),
+      items: next,
+    });
   });
 }
 

@@ -19,6 +19,10 @@ app.get(["/admin", "/admin/"], (req, res) => {
   res.sendFile(path.join(publicDir, "admin", "index.html"));
 });
 
+app.get(["/admin/compras", "/admin/compras/"], (req, res) => {
+  res.sendFile(path.join(publicDir, "admin", "compras", "index.html"));
+});
+
 app.use(express.static(publicDir, { etag: false, maxAge: 0, index: "index.html" }));
 
 const server = http.createServer(app);

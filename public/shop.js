@@ -88,7 +88,7 @@ function visibleProducts() {
   const query = norm(state.query.trim());
   return state.products.filter((product) => {
     const item = viewItem(product.id);
-    if (state.filter === "marked" && (!item.marked || item.bought)) return false;
+    if (state.filter === "marked" && !item.marked) return false;
     if (query && !norm(product.name).includes(query)) return false;
     return true;
   });
@@ -122,8 +122,8 @@ function renderList() {
       title.textContent = "No hay productos con ese nombre.";
       detail.textContent = "Prueba con otra palabra.";
     } else if (state.filter === "marked" && anyMarked) {
-      title.textContent = "Ya está todo comprado.";
-      detail.textContent = "Lo comprado sigue visible en Todos, tachado.";
+      title.textContent = "Lo marcado sigue en esta lista.";
+      detail.textContent = "Incluye lo que ya se marcó como comprado, hasta vaciar la hoja.";
     } else {
       title.textContent = "Nada marcado todavía.";
       detail.textContent = "Toca el recuadro de un producto para agregarlo a la compra.";
@@ -255,7 +255,7 @@ function paint() {
       : null;
 
   const stats = markedStats();
-  markedCountEl.textContent = String(stats.pending);
+  markedCountEl.textContent = String(stats.products);
   summaryEl.textContent = summaryText(stats);
   clearMarksEl.disabled = stats.products === 0;
   document.title = stats.pending ? `(${stats.pending}) Compras` : "Compras";

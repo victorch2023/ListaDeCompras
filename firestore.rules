@@ -58,14 +58,22 @@ service cloud.firestore {
       allow delete: if true;
     }
 
+    function validPurchase(data) {
+      return data.keys().hasOnly(['at', 'items'])
+        && data.at is timestamp
+        && data.items is list
+        && data.items.size() > 0
+        && data.items.size() <= 300;
+    }
+
     match /purchases/{id} {
       allow read: if isOwner();
-      allow create: if request.resource.data.keys().hasOnly(['at', 'items'])
-        && request.resource.data.at == request.time
-        && request.resource.data.items is list
-        && request.resource.data.items.size() > 0
-        && request.resource.data.items.size() <= 300;
-      allow update, delete: if false;
+      allow create: if validPurchase(request.resource.data)
+        && (request.resource.data.at == request.time || isOwner());
+      allow update: if isOwner()
+        && validPurchase(request.resource.data)
+        && request.resource.data.at == resource.data.at;
+      allow delete: if isOwner();
     }
   }
 }

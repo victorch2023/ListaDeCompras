@@ -16,7 +16,6 @@ import {
   updateSection,
   watchAuth,
   watchCatalog,
-  watchPurchases,
 } from "./db.js";
 
 "use strict";
@@ -570,7 +569,7 @@ document.getElementById("add-section-form").addEventListener("submit", async (ev
 });
 
 document.getElementById("clear-marks").addEventListener("click", async () => {
-  if (!window.confirm("¿Quitar todas las marcas? Lo marcado como comprado queda en el historial. El catálogo no se borra.")) return;
+  if (!window.confirm("¿Limpiar la hoja? Se sueltan el recuadro verde y el de comprado. Lo comprado queda en el historial. El catálogo no se borra.")) return;
   try {
     applySnapshot(await clearAllMarks());
     toast("Marcas vaciadas");
@@ -620,61 +619,14 @@ loginForm.addEventListener("submit", async (event) => {
   }
 });
 
-function formatWhen(date) {
-  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "Guardando la hora…";
-  return new Intl.DateTimeFormat("es-PE", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(date);
-}
-
-function renderPurchases(rows) {
-  const root = document.getElementById("purchases");
-  const count = document.getElementById("purchase-count");
-  if (!root || !count) return;
-  count.textContent = rows.length === 1 ? "1 registro" : `${rows.length} registros`;
-  if (!rows.length) {
-    const empty = document.createElement("p");
-    empty.className = "hint";
-    empty.textContent = "Todavía no hay compras registradas.";
-    root.replaceChildren(empty);
-    return;
-  }
-  const fragment = document.createDocumentFragment();
-  for (const row of rows) {
-    const article = document.createElement("article");
-    article.className = "purchase";
-    const when = document.createElement("time");
-    if (row.at instanceof Date && !Number.isNaN(row.at.getTime())) when.dateTime = row.at.toISOString();
-    when.textContent = formatWhen(row.at);
-    const list = document.createElement("ul");
-    for (const item of row.items) {
-      const li = document.createElement("li");
-      const units = item.qty === 1 ? "1 unidad" : `${item.qty} unidades`;
-      li.textContent = `${item.name} · ${units}`;
-      list.append(li);
-    }
-    article.append(when, list);
-    fragment.append(article);
-  }
-  root.replaceChildren(fragment);
-}
-
 let catalogWatch = null;
-let purchaseWatch = null;
 function connect() {
-  if (!catalogWatch) {
-    catalogWatch = watchCatalog((payload) => {
-      const active = document.activeElement;
-      if (active && active.closest && active.closest("#products, #sections, #inbox, .composer, #password-form")) return;
-      applySnapshot(payload);
-    });
-  }
-  if (!purchaseWatch) purchaseWatch = watchPurchases(renderPurchases);
+  if (catalogWatch) return;
+  catalogWatch = watchCatalog((payload) => {
+    const active = document.activeElement;
+    if (active && active.closest && active.closest("#products, #sections, #inbox, .composer, #password-form")) return;
+    applySnapshot(payload);
+  });
 }
 
 function showSetup() {
@@ -697,10 +649,6 @@ if (!configured()) {
     if (catalogWatch) {
       catalogWatch();
       catalogWatch = null;
-    }
-    if (purchaseWatch) {
-      purchaseWatch();
-      purchaseWatch = null;
     }
     showLogin();
   });

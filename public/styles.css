@@ -455,17 +455,49 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
   border-bottom: 1px solid var(--line);
 }
 
+.history-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.history-actions .hint { margin: 0; }
+
+.purchase-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
 .purchase time {
-  display: block;
   font-weight: 650;
 }
 
 .purchase ul {
-  margin: 6px 0 0;
-  padding-left: 1.15rem;
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
 }
 
-.purchase li { margin: 2px 0; }
+.purchase li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 3px 0;
+}
+
+.purchase .mini-remove {
+  border: 0;
+  background: transparent;
+  color: var(--danger);
+  font-size: 13px;
+  padding: 4px 0;
+  white-space: nowrap;
+}
 
 .login-wrap {
   min-height: 100vh;
@@ -615,6 +647,12 @@ input[type="color"] {
   border-radius: 999px;
   padding: 11px 16px;
   white-space: nowrap;
+}
+
+a.btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
 }
 
 .btn.primary { background: var(--green); color: white; }
